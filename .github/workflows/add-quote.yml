@@ -1,0 +1,50 @@
+name: Add quote manually
+
+# Escape hatch: if the site ever blocks the scraper or the parser breaks,
+# a maintainer can paste the day's quote here instead.
+on:
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "Quote date (YYYY-MM-DD)"
+        required: true
+      text:
+        description: "Quote text"
+        required: true
+
+concurrency:
+  group: quote-store
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  add:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install -r scraper/requirements.txt
+
+      - run: python scraper/manual_add.py "$QUOTE_DATE" "$QUOTE_TEXT"
+        working-directory: scraper
+        env:
+          QUOTE_DATE: ${{ inputs.date }}
+          QUOTE_TEXT: ${{ inputs.text }}
+
+      - name: Commit and push if changed
+        run: |
+          if [ -n "$(git status --porcelain quotes latest.json manifest.json)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add quotes latest.json manifest.json
+            git commit -m "chore: manual quote add ${{ inputs.date }}"
+            git push
+          else
+            echo "No changes to commit."
+          fi

@@ -1,0 +1,26 @@
+name: Monthly keep-alive
+
+# GitHub disables scheduled workflows after 60 days without repo activity.
+# Daily quote commits normally keep us alive; this is insurance for the case
+# where the scraper is broken long enough that no commits happen.
+on:
+  schedule:
+    - cron: "0 3 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Touch keep-alive marker
+        run: |
+          date -u +%FT%TZ > .github/keepalive
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/keepalive
+          git commit -m "chore: monthly keep-alive"
+          git push
