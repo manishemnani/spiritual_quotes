@@ -28,7 +28,7 @@ jobs:
 
       - run: pip install -r scraper/requirements.txt
 
-      - run: python scraper/fetch.py
+      - run: python fetch.py
         working-directory: scraper
 
       - name: Commit and push if changed
