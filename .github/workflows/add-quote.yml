@@ -31,7 +31,7 @@ jobs:
 
       - run: pip install -r scraper/requirements.txt
 
-      - run: python scraper/manual_add.py "$QUOTE_DATE" "$QUOTE_TEXT"
+      - run: python manual_add.py "$QUOTE_DATE" "$QUOTE_TEXT"
         working-directory: scraper
         env:
           QUOTE_DATE: ${{ inputs.date }}
