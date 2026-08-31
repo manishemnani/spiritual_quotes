@@ -2,9 +2,10 @@ name: Fetch daily quote
 
 on:
   schedule:
-    # 00:30-17:30 UTC = 06:00-23:00 IST, hourly.
+    # Runs at 00:59 and 01:59 UTC (06:29 AM and 07:29 AM IST )
     # fetch.py exits in seconds once today's quote is already stored.
-    - cron: "30 0-17 * * *"
+    # Removing earlier cron to run hourly 30 0-17 * * *
+    - cron: "59 0,1 * * *"
   workflow_dispatch:
 
 concurrency:
